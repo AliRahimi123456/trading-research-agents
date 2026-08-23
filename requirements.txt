@@ -1,0 +1,15 @@
+# --- deterministic research layer (no key required) ---
+pandas>=2.2
+numpy>=1.26
+requests>=2.31
+matplotlib>=3.8
+python-dotenv>=1.0
+pyarrow>=15.0        # parquet read/write for pandas
+yfinance>=0.2.40      # free historical price data, no API key
+
+# --- agent layer (needs an OpenAI key) ---
+langchain>=0.3
+langchain-openai>=0.2
+langgraph>=0.2
+deepagents
+langsmith
