@@ -28,13 +28,23 @@ space in code, before any agent gets involved:
 
 ## Status
 
-The full deterministic research layer is built, tested, and verified — including a
-manual reproduction of the article's entire v1 → v2 → v3 → freeze → holdout research
-loop, which matches the article's own published numbers closely (validation Sharpe
-matches to 3–4 decimal places on several runs, despite using a different data source).
+Complete, end to end. The deterministic layer (engine, benchmarks, isolation,
+registry, selection rule) is built, tested, and verified. The real LangChain Deep
+Agents team (coordinator / strategy-engineer / research-critic) is wired up and has
+run a genuine, live v1 → v2 → v3 → freeze → holdout research cycle.
 
-The LangChain Deep Agents layer (coordinator / strategy-engineer / research-critic)
-is not yet wired up.
+**The standout result isn't the returns — it's what the guardrails caught.** During
+that one real run: the engineer's code hit a pandas version bug that silently failed
+9 of v1's 12 allotted configurations; a second implementation bug in v2 produced
+identical zero results across three configurations that looked like valid (but
+uninteresting) evidence until inspected closely; and — most importantly — **the
+coordinator misapplied its own fixed selection rule on the final promotion decision**,
+describing a genuine 0.0076 Sharpe improvement as "a tie" and keeping the wrong
+strategy as champion. That error was only caught because the selection rule lives as
+independently-callable code (`select_champion()`), not just agent-narrated behavior —
+re-running it against the real recorded numbers outside the agent's own summary
+proved the coordinator was wrong, and the decision was corrected before freezing.
+Full writeup: [`docs/agent-run-results/report.md`](docs/agent-run-results/report.md).
 
 ## Quickstart
 
@@ -69,6 +79,23 @@ python -m http.server 8000 --directory project/workspace
 
 and open `http://localhost:8000/dashboard.html`.
 
+### Running the real agent layer
+
+Requires an OpenAI API key in `.env` as `OPENAI_API_KEY=sk-...`, plus the agent-layer
+packages (already in `requirements.txt`: `langchain`, `langchain-openai`, `langgraph`,
+`deepagents`, `langsmith`). This makes real, billed API calls.
+
+```bash
+python -m src.run_v1_agent   # coordinator delegates v1, engineer sweeps, critic reviews
+python -m src.run_v2_agent   # v2, tested against v1
+python -m src.run_v3_agent   # v3, the final version -- freezes the champion
+```
+
+Verify each version's decision, review, and successful runs actually landed on disk
+before trusting the coordinator's own summary of what happened — see
+[`docs/agent-run-results/`](docs/agent-run-results/) for what a real run produced,
+including a coordinator error that was caught this way.
+
 ## Project layout
 
 ```
@@ -81,11 +108,16 @@ src/            deterministic research code
   isolation.py    builds the sandbox, scrubs the environment
   registry.py     experiment log, stage gates, sweep/read_registry/record_decision
   selection.py    the fixed 3-gate promotion rule
+  agent_tools.py  @tool-wrapped sweep/read_registry/record_decision for the agents
+  agents.py       the real coordinator/strategy-engineer/research-critic team
+  run_v1_agent.py, run_v2_agent.py, run_v3_agent.py   run each version through the real team
+  write_report.py     self-audit report of the real agent run
   build_dashboard.py  local HTML results dashboard
 
 docs/
-  WORKFLOW.md          the research process, fixed before any strategy was written
-  source-handbook.md   the original article, saved for reference
+  WORKFLOW.md              the research process, fixed before any strategy was written
+  source-handbook.md       the original article, saved for reference
+  agent-run-results/       static snapshot of a real agent run's actual output
 
 project/        runtime data (gitignored) — raw cache, workspace, private/holdout
 ```

@@ -1,0 +1,11 @@
+{
+  "version": "v3",
+  "params": {
+    "top_n": 2,
+    "mom_window": 126,
+    "vol_short": 20,
+    "vol_long": 120,
+    "vol_ratio_min": 1.0
+  },
+  "rationale": "v3 (inverse-volatility weighting among v1's existing eligible names, top_n=2) passed all three selection gates against incumbent v1: validation Sharpe 0.55 vs v1's 0.5424 (a genuine improvement, not a tie), validation max drawdown -0.2943 within 2pp of v1's -0.2954, development turnover 11.9866 within the +20% ceiling of v1's 11.6596. This corrects an earlier coordinator decision that had incorrectly kept v1 as champion by treating a real 0.0076 Sharpe improvement as an insignificant tie -- the fixed selection rule contains no such discretionary clause; it was verified independently against select_champion() run on the real recorded registry data."
+}

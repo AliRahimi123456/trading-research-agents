@@ -1,11 +1,4 @@
-import json
-
-from src.config import WS
-
-frozen = json.loads((WS / "strategies" / "frozen.json").read_text())
-final = json.loads((WS / "results" / "holdout.json").read_text())
-
-REPORT = f"""# Research trail audit
+# Research trail audit
 
 This covers the real, live LangChain Deep Agents research cycle -- coordinator,
 strategy-engineer, research-critic -- not the earlier manual reproduction used to
@@ -86,7 +79,7 @@ in the abstract -- all three happened, for real, in this one research cycle.
 
 | | CAGR | Sharpe | Max DD |
 |---|---:|---:|---:|
-| **Frozen v3 (holdout)** | **{final['holdout']['cagr']:.4f}** | **{final['holdout']['sharpe']:.4f}** | **{final['holdout']['max_dd']:.4f}** |
+| **Frozen v3 (holdout)** | **0.1345** | **0.7863** | **-0.2243** |
 | SPY buy-and-hold | 0.1127 | 0.6829 | -0.2450 |
 | Equal-weight buy-and-hold | 0.0986 | 0.6372 | -0.1822 |
 | Plain momentum | 0.0522 | 0.3637 | -0.2369 |
@@ -127,9 +120,3 @@ volatility is more useful as a sizing input than as a gate.
   validated edge.** The process being followed correctly (after correction) says
   nothing about whether volatility-weighted momentum has genuine, repeatable value
   going forward.
-"""
-
-if __name__ == "__main__":
-    out = WS / "report.md"
-    out.write_text(REPORT, encoding="utf-8")
-    print(f"report written to {out}")

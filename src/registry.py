@@ -1,6 +1,9 @@
 import json
 import time
 
+import matplotlib
+matplotlib.use("Agg")  # non-interactive, thread-safe: we only ever save PNGs, never display them
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
